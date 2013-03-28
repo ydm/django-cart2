@@ -1,28 +1,36 @@
-from django.test import TestCase
-from models import Cart, Item
-from django.contrib.auth.models import User
+# -*- coding: utf-8 -*-
+
+from __future__ import unicode_literals
+
 import datetime
 from decimal import Decimal
+
+from django.contrib.auth.models import User
+from django.test import TestCase
+from django.utils import six
+
+from cart import models
+
 
 class CartAndItemModelsTestCase(TestCase):
 
     def _create_cart_in_database(self, creation_date=datetime.datetime.now(), 
-            checked_out=False):
+                                 checked_out=False):
         """
             Helper function so I don't repeat myself
         """
-        cart = Cart()
+        cart = models.Cart()
         cart.creation_date = creation_date
-        cart.checked_out = False
+        cart.checked_out = checked_out
         cart.save()
         return cart
 
     def _create_item_in_database(self, cart, product, quantity=1, 
-            unit_price=Decimal("100")):
+                                 unit_price=Decimal("100")):
         """
             Helper function so I don't repeat myself
         """  
-        item = Item()
+        item = models.Item()
         item.cart = cart
         item.product = product
         item.quantity = quantity
@@ -43,9 +51,9 @@ class CartAndItemModelsTestCase(TestCase):
     def test_cart_creation(self):
         creation_date = datetime.datetime.now()
         cart = self._create_cart_in_database(creation_date)
-        id = cart.id
+        pk = cart.pk
 
-        cart_from_database = Cart.objects.get(pk=id)
+        cart_from_database = models.Cart.objects.get(pk=pk)
         self.assertEquals(cart, cart_from_database)
         
 
@@ -105,6 +113,7 @@ class CartAndItemModelsTestCase(TestCase):
         user = self._create_user_in_database()
         cart = self._create_cart_in_database()
 
-        item = self._create_item_in_database(cart, product=user, quantity=3, unit_price=Decimal("100"))
+        item = self._create_item_in_database(cart, product=user,
+            quantity=3, unit_price=Decimal("100"))
 
-        self.assertEquals(item.__unicode__(), "3 units of User")
+        self.assertEquals(six.text_type(item), "3 units of User")
