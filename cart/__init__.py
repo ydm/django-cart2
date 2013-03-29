@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 from cart import models
 
 
-class Cart:
+class Cart(object):
 
     def __init__(self, request):
         cart = None
@@ -19,6 +19,7 @@ class Cart:
             cart = models.Cart()
             cart.save()
             request.session['__cart__'] = cart.pk
+            request.session.modified = True
         self.cart = cart
 
     def __iter__(self):
