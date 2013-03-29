@@ -1,17 +1,26 @@
+# -*- coding: utf-8 -*-
+
+from __future__ import unicode_literals
 import datetime
+
 from cart import models
 
-CART_ID = 'CART-ID'
 
-class ItemAlreadyExists(Exception):
+class CartException(Exception):
     pass
 
-class ItemDoesNotExist(Exception):
+
+class ItemAlreadyExists(CartException):
     pass
+
+
+class ItemDoesNotExist(CartException):
+    pass
+
 
 class Cart:
     def __init__(self, request):
-        cart_id = request.session.get(CART_ID)
+        cart_id = request.session.get('CART_ID')
         if cart_id:
             try:
                 cart = models.Cart.objects.get(id=cart_id, checked_out=False)
@@ -28,7 +37,7 @@ class Cart:
     def new(self, request):
         cart = models.Cart(creation_date=datetime.datetime.now())
         cart.save()
-        request.session[CART_ID] = cart.id
+        request.session['CART_ID'] = cart.id
         return cart
 
     def add(self, product, unit_price, quantity=1):
@@ -60,6 +69,7 @@ class Cart:
         else:
             item.delete()
 
+    # TODO
     def update(self, product, quantity, unit_price=None):
         try:
             item = models.Item.objects.get(
