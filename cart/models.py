@@ -13,7 +13,7 @@ from django.utils.encoding import python_2_unicode_compatible
 
 class Cart(models.Model):
     created = models.DateTimeField(auto_now_add=True)
-    checked_out = models.BooleanField(default=False)
+    checked_out = models.BooleanField(default=False) # TODO...
 
     @python_2_unicode_compatible
     def __str__(self):
@@ -25,25 +25,21 @@ class Item(models.Model):
     cart = models.ForeignKey(Cart)
     quantity = models.PositiveIntegerField()
 
-    product_type = models.ForeignKey(ContentType)
-    product_id = models.PositiveIntegerField()
-    _product = generic.GenericForeignKey('product_type', 'product_id')
+    content_type = models.ForeignKey(ContentType)
+    object_id = models.PositiveIntegerField()
+    product = generic.GenericForeignKey()
 
     class Meta:
-        verbose_name = 'item'
-        verbose_name_plural = 'items'
-        ordering = ('cart',)
-        unique_together = ('cart', 'product_type', 'product_id')
+        unique_together = ('cart', 'content_type', 'object_id')
 
     @python_2_unicode_compatible
     def __str__(self):
-        return u'%d units of %s' % (self.quantity, self.product.__class__.__name__)
+        return '{} x {}'.format(self.quantity, self.product)
 
-    @property
-    def product(self):
-        return self._product
 
-    @product.setter
-    def product(self, value):
-        self.product_type = ContentType.objects.get_for_model(value)
-        self.product_id = value.pk
+class TestProduct(models.Model):
+    num = models.IntegerField(unique=True)
+
+    @python_2_unicode_compatible
+    def __str__(self):
+        return '{}'.format(self.num)
