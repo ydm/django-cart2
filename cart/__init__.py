@@ -16,6 +16,21 @@ from django.utils import six
 from cart import models
 
 
+def delete(session):
+    """Delete the cart that is currently stored in `session` and cleanup
+    the database.
+
+    """
+    pk = session.pop('__cart__', None)
+    if pk:
+        try:
+            cart = models.Cart.objects.get(pk=pk)
+        except models.Cart.DoesNotExist:
+            pass
+        else:
+            cart.delete()
+
+
 class Cart(object):
 
     def __init__(self, session):
@@ -81,10 +96,9 @@ class Cart(object):
         args = self._lookup_args(product)
         args.update({'defaults': {'quantity': quantity}})
         item, created = models.Item.objects.get_or_create(**args)
-        if not created:
+        if not created and item.quantity != int(quantity):
             item.quantity = quantity
             item.save()
-
         self._modified = True
 
     def incrby_quantity(self, product, value):
