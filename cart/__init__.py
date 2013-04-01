@@ -11,6 +11,7 @@
 from __future__ import unicode_literals
 
 from django.contrib.contenttypes.models import ContentType
+from django.utils import six
 
 from cart import models
 
@@ -116,6 +117,17 @@ class Cart(object):
         items = self._items_for_products(difference)
         items.delete()
         self._modified = True
+
+    def set_products(self, products):
+        """Update this cart using the data in `products`.  `products` should
+        be a mapping in the following format:
+        {product_object: quantity}.
+
+        """
+        # TODO: Can I actually optimize this routine?
+        self.remove_all()
+        for p, q in six.iteritems(products):
+            self.add(p, q)
 
     @property
     def total(self):
