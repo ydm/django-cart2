@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-# pylint: disable=W0142
+# pylint: disable=W0141,W0142
+# W0141: Used builtin function
 # W0142: Used * or * magic*
 
 # TODO: The Cart._products() method caches the results for better
@@ -106,15 +107,6 @@ class Cart(object):
         self._cart.item_set.all().delete()
         self._modified = True
 
-    @property
-    def total(self):
-        """Return the total number of products in this cart.  That is the sum
-        of all the quantities.
-
-        """
-        return sum(item.quantity for item in
-            self._cart.item_set.iterator())
-
     def remove_different(self, products):
         """Remove all elements currently stored in this cart that are not part
         of the sequence `products`.
@@ -124,3 +116,12 @@ class Cart(object):
         items = self._items_for_products(difference)
         items.delete()
         self._modified = True
+
+    @property
+    def total(self):
+        """Return the total number of products in this cart.  That is the sum
+        of all the quantities.
+
+        """
+        return sum(item.quantity for item in
+            self._cart.item_set.iterator())
