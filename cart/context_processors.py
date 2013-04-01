@@ -11,4 +11,4 @@ from cart import Cart
 
 def add_cart(request):
     """Include cart in context data"""
-    return {'cart': Cart(request)}
+    return {'cart': Cart(request.session)}
