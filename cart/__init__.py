@@ -16,7 +16,7 @@ from django.utils import six
 from cart import models
 
 
-def delete(session):
+def cleanup(session):
     """Delete the cart that is currently stored in `session` and cleanup
     the database.
 
@@ -100,6 +100,10 @@ class Cart(object):
             item.quantity = quantity
             item.save()
         self._modified = True
+
+    def empty(self):
+        """Return `True` if cart is empty."""
+        return len(self._products()) == 0
 
     def incrby_quantity(self, product, value):
         """Add integer `value` to item.quantity atomically"""
