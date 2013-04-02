@@ -11,15 +11,15 @@ from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 
 
+@python_2_unicode_compatible
 class Cart(models.Model):
     created = models.DateTimeField(auto_now_add=True)
-    checked_out = models.BooleanField(default=False) # TODO...
 
-    @python_2_unicode_compatible
     def __str__(self):
         return '{}, {}'.format(self.pk, self.created)
 
 
+@python_2_unicode_compatible
 class Item(models.Model):
 
     cart = models.ForeignKey(Cart)
@@ -32,14 +32,13 @@ class Item(models.Model):
     class Meta:
         unique_together = ('cart', 'content_type', 'object_id')
 
-    @python_2_unicode_compatible
     def __str__(self):
         return '{} x {}'.format(self.quantity, self.product)
 
 
+@python_2_unicode_compatible
 class TestProduct(models.Model):
     num = models.IntegerField(unique=True)
 
-    @python_2_unicode_compatible
     def __str__(self):
         return '{}'.format(self.num)
