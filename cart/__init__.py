@@ -101,6 +101,7 @@ class Cart(object):
             item.save()
         self._modified = True
 
+    @property
     def empty(self):
         """Return `True` if cart is empty."""
         return len(self._products()) == 0
