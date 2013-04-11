@@ -101,6 +101,21 @@ class Cart(object):
             item.save()
         self._modified = True
 
+    def add_products(self, products):
+        """Add given products to cart.
+
+        Arguments:
+        - `products`: a dictionary of product objects mapped to
+          quantities.
+          For example
+          { <Product: A product>       : 1,
+            <Product: Another product> : 2 }
+
+        """
+        # TODO: Can I actually optimize this and insert them all at
+        # once?
+        return [self.add(p, q) for p, q in products.items()]
+
     @property
     def empty(self):
         """Return `True` if cart is empty."""
