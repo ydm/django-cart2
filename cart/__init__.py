@@ -10,6 +10,7 @@
 
 from __future__ import unicode_literals
 
+from django.utils.encoding import python_2_unicode_compatible
 from django.contrib.contenttypes.models import ContentType
 from django.utils import six
 
@@ -31,6 +32,7 @@ def cleanup(session):
             cart.delete()
 
 
+@python_2_unicode_compatible
 class Cart(object):
 
     def __init__(self, session):
@@ -91,6 +93,11 @@ class Cart(object):
                 for item in self._cart.item_set.iterator()]
             self._modified = False
         return self._cached_products
+
+    def __str__(self):
+        return '\n'.join(
+            '{} x {}'.format(item.quantity, item.product) for item in self
+        )
 
     def add(self, product, quantity=1):
         args = self._lookup_args(product)
