@@ -91,7 +91,7 @@ else:
     pass # not empty
 
 # Get the total number of products inside the cart
-total_numbers_in_cart = c.total
+total_number_of_products_in_cart = c.total
 
 # Check if a product is in the cart
 if product in c:
