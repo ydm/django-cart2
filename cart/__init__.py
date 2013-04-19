@@ -134,6 +134,7 @@ class Cart(object):
                                       models.Item.objects.select_for_update())
         item.quantity += int(value)
         item.save()
+        return item.quantity
 
     def quantity(self, product):
         item = self._item_for_product(product)
