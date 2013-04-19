@@ -145,8 +145,6 @@ cart.cleanup(session)
 Actually the original cart is right there under the name
 `django-cart`.
 
-The interface 
-
 Anyway, I don't think that's a serious enough project to take up space
 there for a cloning with just minor updates as this one.  The license
 is LGPL and you're fully free to fork/copy the code and create a
