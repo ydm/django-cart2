@@ -1,89 +1,136 @@
-# Introduction
+Cart2
+-----
 
-django-cart is a very simple application that just let you add and remove items from a session based cart. django-cart uses the power of the Django content type framework to enable you to have your own Product model and associate with the cart without having to change anything. Please refer to the tests to see how it's done.
+Simple cart package for Django.
 
-## Prerequisites
+It was sequentially maintained by:
+* Eric Woudenberg
+* Marc Garcia
+* Bruno Carvalho
 
-- Django 1.1+
-- django content type framework in your INSTALLED_APPS
-- south for migrations (optional)
+I made a fork and enriched it by adding features.  All the code is
+rewritten with Python 3 compliance in mind.  Python2 is supported
+using the django.utils.six package which is part of Django as of
+version 1.5.
 
-## Installation
+The cart is successfully used in a real-world shop without any problems so far.
 
-To install this just type:
+##Prerequisites
+* Django 1.5
+* Django Content Types app
+* Django Session app
 
-```
-python setup.py install
-```
+##Installation
+1. Add `'cart'` to `INSTALLED_APPS`
+2. Run `./manage.py syncdb`
 
-or
+##Guide
 
-```
-pip install django-cart
-```
-
-After installation is complete:
-
-1. add 'cart' to your INSTALLED_APPS directive and
-2. If you have South migrations type: `./manage.py migrate cart`
-3. or if you don't: `./manage.py syncdb`
-
-## Usage
-
-A basic usage of django-cart could be (example):
-
+####Create a cart for current session
 ```python
-# views.py
-from cart import Cart
-from myproducts.models import Product
+import cart
 
-def add_to_cart(request, product_id, quantity):
-    product = Product.objects.get(id=product_id)
-    cart = Cart(request)
-    cart.add(product, product.unit_price, quantity)
+session = request.session or {}
+c = cart.Cart(session)```
 
-def remove_from_cart(request, product_id):
-    product = Product.objects.get(id=product_id)
-    cart = Cart(request)
-    cart.remove(product)
+####Add/Remove products from cart
+```python
+# Add a product
+product = myapp.models.Product.objects.get(pk=product_pk)
+quantity = 10
+c.add(product, quantity)
 
-def get_cart(request):
-    return render_to_response('cart.html', dict(cart=Cart(request)))
-```
+# Remove a product
+product = myapp.models.Product.objects.get(pk=product_pk)
+c.remove(product)```
 
-```django
-# templates/cart.html
-{% extends 'base.html' %}
+####Quantity methods
+```python
+# Check quantity of product
+quantity_of_product = c.quantity(product)
 
-{% block body %}
-    <table>
-        <tr>
-            <th>Product</th>
-            <th>Quantity</th>
-            <th>Total Price</th>
-        </tr>
+# Increase quantity by one
+# Please note that incrby_quantity doesn't check the quantity value
+new_quantity = c.incrby_quantity(product, 1)
+
+# Decrease quantity by 2
+new_quantity = c.incrby_quantity(product, 2)```
+
+####Batch operations
+```python
+product_pks = [1, 2, 3, 4, 5]
+product_qts = [6, 7, 8, 9, 10]
+products = {
+    myapp.models.Product.objects.get(pk=pk) : qt
+    for pk, qt in zip(product_pks, product_qts)
+}
+
+# Add products at once
+c.add_products(products)
+
+# Leave just these products in cart and remove all other
+products = myapp.models.Product.objects.filter(pk__in=[1,2,3])
+c.remove_different(products)
+
+# Update the cart (by removing all existing products and adding just the new ones)
+c.set_products(products)
+
+# Remove all products
+c.remove_all()```
+
+####State
+```python
+# Check if the cart is empty
+if c.empty:
+    # empty
+else:
+    # not empty
+
+# Get the total number of products inside the cart
+total_numbers_in_cart = c.total```
+
+####Use in templates
+First you have to add the `'cart.context_processors.add_cart'` to your
+`TEMPLATE_CONTEXT_PROCESSORS` list.
+
+```html
+{% if cart.empty %}
+    <h1>Your cart is empty</h1>
+{% else %}
+    <h1>You have {{ cart.total }} products in your cart</h1>
+    <ul>
         {% for item in cart %}
-        <tr>
-            <td>{{ item.product.name }}</td>
-            <td>{{ item.quantity }}</td>
-            <td>{{ item.total_price }}</td>
-        </tr>
+            <li>{{ item.quantity }} x {{ item.product }}</li>
         {% endfor %}
-    </table>
-{% endblock %}
-```
+    </ul>
+{% endif %}```
 
-## Some Info
+####Template tags
+There is a simple template-tag you can use to check the quantity of a
+product (given you have just the product object at hand).
+```html
+{% load carttags %}
+<h1>{{ product }}</h1>
+{% if product in cart %}
+    <p>You have {% cart_quantity cart product %} products of this
+       type inside your cart.</p>
+{% else %}
+    <p>This product is not in your cart</p>
+{% endif %}```
 
-This project was abandoned and I got it and added tests and South migrations, and I will be maintaining it from now on. 
+###Why it's not on PyPi
+Actually the original cart is right there under the name
+`django-cart`.
 
-## Known Problems
+The interface 
 
-Right now the main problem is that it adds a database record for each cart it creates. I'm in the process of studying this and will soon implement something to handle it.
+Anyway, I don't think that's a serious enough project to take up space
+there for a cloning with just minor updates as this one.  The license
+is LGPL and you're fully free to fork/copy the code and create a
+package on your own, if you need such a thing.  Suit yourself.
 
+I plan to maintain this cart right here as long as I need it in my
+work.
 
-## A note on the authors of this project
-
-This project is a fork of [django-cart](http://code.google.com/p/django-cart/ "django-cart") on Google Code. It was originally started by Eric Woudenberg and followed up by Marc Garcia <http://vaig.be>. The last change ocurred in March 25 2009, without any tests. My goal is to push this project a little further by adding tests to guarantee it's functionality and to fix the main issues. I intend to keep it as simple as it is.
-
-- Bruno Carvalho
+###Known problems
+A lot.  It uses the db a lot and makes unnecessary queries.
