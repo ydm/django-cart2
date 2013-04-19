@@ -3,12 +3,12 @@ Cart2
 
 Simple cart package for Django.
 
-It was sequentially maintained by:
+In the past it was sequentially maintained by:
 * Eric Woudenberg
 * Marc Garcia
 * Bruno Carvalho
 
-I made a fork and enriched it by adding bettering the code and adding
+I made a fork and enriched it by bettering the code and adding
 features for convenience.  All the code is (re)written with a future
 Python 3 compliance in mind.  Python2 is supported using the
 django.utils.six package which is part of Django as of version 1.5.
