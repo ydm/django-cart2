@@ -9,9 +9,9 @@ It was sequentially maintained by:
 * Bruno Carvalho
 
 I made a fork and enriched it by adding features.  All the code is
-rewritten with Python 3 compliance in mind.  Python2 is supported
-using the django.utils.six package which is part of Django as of
-version 1.5.
+rewritten with a future Python 3 compliance in mind.  Python2 is
+supported using the django.utils.six package which is part of Django
+as of version 1.5.
 
 The cart is successfully used in a real-world shop without any problems so far.
 
@@ -31,7 +31,8 @@ The cart is successfully used in a real-world shop without any problems so far.
 import cart
 
 session = request.session or {}
-c = cart.Cart(session)```
+c = cart.Cart(session)
+```
 
 ####Add/Remove products from cart
 ```python
@@ -42,7 +43,8 @@ c.add(product, quantity)
 
 # Remove a product
 product = myapp.models.Product.objects.get(pk=product_pk)
-c.remove(product)```
+c.remove(product)
+```
 
 ####Quantity methods
 ```python
@@ -54,7 +56,8 @@ quantity_of_product = c.quantity(product)
 new_quantity = c.incrby_quantity(product, 1)
 
 # Decrease quantity by 2
-new_quantity = c.incrby_quantity(product, 2)```
+new_quantity = c.incrby_quantity(product, 2)
+```
 
 ####Batch operations
 ```python
@@ -76,7 +79,8 @@ c.remove_different(products)
 c.set_products(products)
 
 # Remove all products
-c.remove_all()```
+c.remove_all()
+```
 
 ####State
 ```python
@@ -87,7 +91,8 @@ else:
     # not empty
 
 # Get the total number of products inside the cart
-total_numbers_in_cart = c.total```
+total_numbers_in_cart = c.total
+```
 
 ####Use in templates
 First you have to add the `'cart.context_processors.add_cart'` to your
@@ -103,7 +108,8 @@ First you have to add the `'cart.context_processors.add_cart'` to your
             <li>{{ item.quantity }} x {{ item.product }}</li>
         {% endfor %}
     </ul>
-{% endif %}```
+{% endif %}
+```
 
 ####Template tags
 There is a simple template-tag you can use to check the quantity of a
@@ -116,7 +122,8 @@ product (given you have just the product object at hand).
        type inside your cart.</p>
 {% else %}
     <p>This product is not in your cart</p>
-{% endif %}```
+{% endif %}
+```
 
 ###Why it's not on PyPi
 Actually the original cart is right there under the name
