@@ -8,10 +8,10 @@ It was sequentially maintained by:
 * Marc Garcia
 * Bruno Carvalho
 
-I made a fork and enriched it by adding features.  All the code is
-rewritten with a future Python 3 compliance in mind.  Python2 is
-supported using the django.utils.six package which is part of Django
-as of version 1.5.
+I made a fork and enriched it by adding bettering the code and adding
+features for convenience.  All the code is (re)written with a future
+Python 3 compliance in mind.  Python2 is supported using the
+django.utils.six package which is part of Django as of version 1.5.
 
 The cart is successfully used in a real-world shop without any problems so far.
 
@@ -86,12 +86,20 @@ c.remove_all()
 ```python
 # Check if the cart is empty
 if c.empty:
-    # empty
+    pass # yep, it's empty
 else:
-    # not empty
+    pass # not empty
 
 # Get the total number of products inside the cart
 total_numbers_in_cart = c.total
+
+# Check if a product is in the cart
+if product in c:
+    pass # Cart has it stored
+
+# Iterate over all items of the cart
+for item in cart:
+    do_something(item, item.product, item.quantity)
 ```
 
 ####Use in templates
@@ -112,7 +120,7 @@ First you have to add the `'cart.context_processors.add_cart'` to your
 ```
 
 ####Template tags
-There is a simple template-tag you can use to check the quantity of a
+There is a simple template tag you can use to check the quantity of a
 product (given you have just the product object at hand).
 ```html
 {% load carttags %}
@@ -123,6 +131,14 @@ product (given you have just the product object at hand).
 {% else %}
     <p>This product is not in your cart</p>
 {% endif %}
+```
+
+####Remove the cart itself and cleanup the session
+```python
+import cart
+
+session = request.session
+cart.cleanup(session)
 ```
 
 ###Why it's not on PyPi
