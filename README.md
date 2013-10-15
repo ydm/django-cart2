@@ -56,7 +56,7 @@ quantity_of_product = c.quantity(product)
 new_quantity = c.incrby_quantity(product, 1)
 
 # Decrease quantity by 2
-new_quantity = c.incrby_quantity(product, 2)
+new_quantity = c.incrby_quantity(product, -2)
 ```
 
 ####Batch operations
