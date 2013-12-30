@@ -15,6 +15,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.utils import six
 
 from cart import models
+from cart.meta import serialize, deserialize
 
 
 def cleanup(session):
@@ -99,12 +100,33 @@ class Cart(object):
             '{} x {}'.format(item.quantity, item.product) for item in self
         )
 
-    def add(self, product, quantity=1):
+    def meta_for_product(self, product):
+        """Return a dictionary or None."""
+        item = self._item_for_product(product)
+        return item.meta if item else None
+
+    def set_meta(self, product, key, value):
+        """Return True on success, False otherwise."""
+        meta = self.meta_for_product(product)
+        if meta:
+            meta[key] = value
+            return True
+        return False
+
+    def get_meta(self, product, key):
+        """Return the keyed meta value for this product or None."""
+        meta = self.meta_for_product(product)
+        return meta[key] if meta else None
+
+    def add(self, product, quantity=1, meta=None):
+        serialized = serialize(meta)
         args = self._lookup_args(product)
-        args.update({'defaults': {'quantity': quantity}})
+        args.update({'defaults': {'quantity': quantity, 
+                                  'metafld': serialized}})
         item, created = models.Item.objects.get_or_create(**args)
         if not created and item.quantity != int(quantity):
             item.quantity = quantity
+            item.metafld = serialized
             item.save()
         self._modified = True
 
@@ -113,8 +135,7 @@ class Cart(object):
 
         Arguments:
         - `products`: a dictionary of product objects mapped to
-          quantities.
-          For example
+          quantities.  For example:
           { <Product: A product>       : 1,
             <Product: Another product> : 2 }
 
