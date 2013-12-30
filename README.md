@@ -59,6 +59,31 @@ new_quantity = c.incrby_quantity(product, 1)
 new_quantity = c.incrby_quantity(product, -2)
 ```
 
+####Meta information for products in cart
+```python
+# Products can now be added to cart with complementary meta information.
+# The meta information should always be a dictionary.
+product = myapp.models.Product.objects.get(pk=product_pk)
+c.add(product, meta={'color': 'black'})
+
+# Get all the meta information for a product
+dictionary_or_none = c.meta_for_product(product)
+
+# Access meta information for particular product
+value_or_key_error_or_none = c.get_meta(product, 'color')
+
+# Access meta information while iterating over cart items
+for item in c:
+    value_or_key_error = item.meta['color']
+
+# Set meta information for particular product
+c.set_meta(product, 'color', 'pink')
+
+# Set meta information while iterating over cart items
+for item in c:
+    item.meta['color'] = 'pink'
+```
+
 ####Batch operations
 ```python
 product_pks = [1, 2, 3, 4, 5]
