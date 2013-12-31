@@ -15,7 +15,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.utils import six
 
 from cart import models
-from cart.meta import serialize, deserialize
+from cart.meta import serialize
 
 
 def cleanup(session):
@@ -119,12 +119,13 @@ class Cart(object):
         return meta[key] if meta else None
 
     def add(self, product, quantity=1, meta=None):
+        """Add or update a product"""
         serialized = serialize(meta)
         args = self._lookup_args(product)
         args.update({'defaults': {'quantity': quantity, 
                                   'metafld': serialized}})
         item, created = models.Item.objects.get_or_create(**args)
-        if not created and item.quantity != int(quantity):
+        if not created:
             item.quantity = quantity
             item.metafld = serialized
             item.save()
