@@ -119,7 +119,11 @@ class Cart(object):
         return meta[key] if meta else None
 
     def add(self, product, quantity=1, meta=None):
-        """Add or update a product"""
+        """Add or update a product.  If `meta` is None, existing meta
+        information aren't changed at all.  If you want to delete
+        current meta using this method, pass '{}' as `meta` value.
+
+        """
         serialized = serialize(meta)
         args = self._lookup_args(product)
         args.update({'defaults': {'quantity': quantity, 
@@ -127,7 +131,8 @@ class Cart(object):
         item, created = models.Item.objects.get_or_create(**args)
         if not created:
             item.quantity = quantity
-            item.metafld = serialized
+            if meta is not None:
+                item.metafld = serialized
             item.save()
         self._modified = True
 
@@ -177,15 +182,18 @@ class Cart(object):
         of the sequence `products`.
 
         """
-        difference = filter(lambda p: p not in products, self._products())
-        items = self._items_for_products(difference)
-        items.delete()
-        self._modified = True
+        diff = list(filter(lambda p: p not in products, self._products()))
+        if diff:
+            items = self._items_for_products(diff)
+            items.delete()
+            self._modified = True
 
     def set_products(self, products):
         """Update this cart using the data in `products`.  `products` should
         be a mapping in the following format:
         {product_object: quantity}.
+
+        TODO y: Let's support meta information with this method.
 
         """
         # TODO: Can I actually optimize this routine?

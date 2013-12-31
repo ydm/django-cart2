@@ -145,8 +145,10 @@ First you have to add the `'cart.context_processors.add_cart'` to your
 ```
 
 ####Template tags
-There is a simple template tag you can use to check the quantity of a
-product (given you have just the product object at hand).
+There are few template tags that help you:
+
+1. Get the quantity of a product (given you have just the product object
+at hand).
 ```html
 {% load carttags %}
 <h1>{{ product }}</h1>
@@ -156,6 +158,14 @@ product (given you have just the product object at hand).
 {% else %}
     <p>This product is not in your cart</p>
 {% endif %}
+```
+
+2. Get the meta information for product as json
+```html
+{% load carttags %}
+<script>
+    var productMeta = {% cart_meta_as_json cart product %};
+</script>
 ```
 
 ####Remove the cart itself and cleanup the session
